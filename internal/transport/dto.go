@@ -15,6 +15,10 @@ type ErrorsDTO struct {
 	Time  time.Time `json:"time"`
 }
 
+type RegisterResponce struct {
+	JwtToken string `json:"token"`
+}
+
 func ErrorsDtoToString(errDTO *ErrorsDTO) string {
 	errDTOJson, _ := json.Marshal(errDTO)
 

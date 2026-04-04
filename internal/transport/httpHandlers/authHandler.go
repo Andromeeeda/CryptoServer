@@ -38,7 +38,8 @@ func (h *AuthHandler) Register(w http.ResponseWriter, r *http.Request) {
 	//далее передать данные которые преобразовали из JSon в service для создания пользователя
 	//Создать пользователя и обработать ошибки
 	//Вернуть тело ответа и статус код
-	if err := h.authService.RegisterUser(registerRequest.Username, registerRequest.Password); err != nil {
+	jwtToken, err := h.authService.RegisterUser(registerRequest.Username, registerRequest.Password)
+	if err != nil {
 		errDto := transport.ErrorsDTO{
 			Erorr: err.Error(),
 			Time:  time.Now(),
@@ -47,11 +48,16 @@ func (h *AuthHandler) Register(w http.ResponseWriter, r *http.Request) {
 
 		http.Error(w, transport.ErrorsDtoToString(&errDto), http.StatusConflict)
 
+		return
 	}
 
-	send := "Пользователь зарегестрирован"
-	fmt.Println(send)
+	responce := transport.RegisterResponce{
+		JwtToken: jwtToken,
+	}
+
+	msg := "Пользователь зарегестрирован"
+	fmt.Println(msg)
 	w.WriteHeader(http.StatusCreated)
-	w.Write([]byte(send))
+	json.NewEncoder(w).Encode(responce)
 
 }

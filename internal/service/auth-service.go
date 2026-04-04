@@ -2,6 +2,7 @@ package service
 
 import (
 	"cryptoserver/internal/repository"
+	"cryptoserver/pkg/jwt"
 	"errors"
 )
 
@@ -15,14 +16,15 @@ func NewAuthService(userRepository *repository.UserRep) *AuthService {
 	}
 }
 
-func (s *AuthService) RegisterUser(name string, password string) error {
+func (s *AuthService) RegisterUser(name string, password string) (string,error) {
 
 	//1.Проверить есть ли пользователь. Если есть то отменить регистрацию
 	//2.Создать и Добавить нового пользователя в мапу
+	//Создать JWt токен и вернуть его 
 	check := s.userRepository.ExistByUserName(name)
 
 	if check {
-		return errors.New("user already exist")
+		return "",errors.New("user already exist")
 	}
 
 	user := repository.User{
@@ -32,9 +34,16 @@ func (s *AuthService) RegisterUser(name string, password string) error {
 
 	//добавление и создание в мапу
 	if err := s.userRepository.Create(&user); err != nil {
-		return err
+		return "",err
 	}
 
-	return nil
+	//Создание JWT токена
+
+	jwtToken,err := jwt.GenerateJwtToken(name); 
+	if err != nil {
+		return "",err
+	}
+
+	return jwtToken,nil
 
 }
