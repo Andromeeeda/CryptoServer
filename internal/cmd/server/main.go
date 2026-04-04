@@ -19,6 +19,7 @@ func main() {
 	authHandler := httphandlers.NewAuthHandler(authService)
 
 	router.Path("/auth/register").Methods("POST").HandlerFunc(authHandler.Register)
+	router.Path("/auth/login").Methods("POST").HandlerFunc(authHandler.Login)
 
 	if err := http.ListenAndServe(":8080", router); err != nil {
 		fmt.Println("fail to listen server")

@@ -10,13 +10,22 @@ type RegisterRequest struct {
 	Password string `json:"password"`
 }
 
+type RegisterResponce struct {
+	JwtToken string `json:"token"`
+}
+
+type LoginRequest struct {
+	Username string `json:"username"`
+	Password string `json:"password"`
+}
+
+type LoginResponce struct {
+	JwtToken string `json:"token"`
+}
+
 type ErrorsDTO struct {
 	Erorr string    `json:"error"`
 	Time  time.Time `json:"time"`
-}
-
-type RegisterResponce struct {
-	JwtToken string `json:"token"`
 }
 
 func ErrorsDtoToString(errDTO *ErrorsDTO) string {

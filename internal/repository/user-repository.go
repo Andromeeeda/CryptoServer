@@ -28,3 +28,12 @@ func (r *UserRep) ExistByUserName(name string) bool {
 	_, exist := r.users[name]
 	return exist
 }
+
+func (r *UserRep) FindByUsername(name string) (*User,error) {
+	user,ok := r.users[name]
+	if !ok {
+		return nil,errors.New("Error while receiving user data. Incorrect username")
+	}
+
+	return user,nil
+}
