@@ -33,3 +33,15 @@ func ErrorsDtoToString(errDTO *ErrorsDTO) string {
 
 	return string(errDTOJson)
 }
+
+type CryptoSymbolReguest struct {
+	Symbol string `json:"symbol"`
+}
+
+type CryptoResponce struct {
+	Symbol        string `json:"symbol"`
+	Name          string `json:"name"`
+	Current_price float64 `json:"current_price"`
+	Last_updated  time.Time `json:"last_updated"`
+}
+
