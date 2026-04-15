@@ -27,6 +27,8 @@ func main() {
 	router.Path("/auth/login").Methods("POST").HandlerFunc(authHandler.Login)
 
 	router.Path("/crypto").Methods("POST").HandlerFunc(cryptoHandler.CreateCrypto)
+	router.Path("/crypto").Methods("GET").HandlerFunc(cryptoHandler.GetCrypto)
+	router.Path("/crypto/{symbol}").Methods("GET").HandlerFunc(cryptoHandler.GetCryptoBySymbol)
 
 	if err := http.ListenAndServe(":8080", router); err != nil {
 		fmt.Println("fail to listen server")
