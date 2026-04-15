@@ -9,6 +9,8 @@ import (
 	"fmt"
 	"net/http"
 	"time"
+
+	"github.com/gorilla/mux"
 )
 
 type CryptoHandler struct {
@@ -93,6 +95,62 @@ func (c *CryptoHandler) CreateCrypto(w http.ResponseWriter, r *http.Request) {
 
 	fmt.Println("Cryptocurrency successfully added")
 	w.WriteHeader(http.StatusCreated)
+	json.NewEncoder(w).Encode(cryptoResponce)
+
+}
+
+func (c *CryptoHandler) GetCrypto(w http.ResponseWriter, r *http.Request) {
+	//Хендлер вызывает функицю сервиса который обращается к репозиторию и получает слайс с криптой
+
+	cryptos, err := c.cryptoService.ListCrypto()
+	if err != nil {
+		errDTO := transport.ErrorsDTO{
+			Erorr: err.Error(),
+			Time:  time.Now(),
+		}
+
+		fmt.Println("Error!", errDTO)
+
+		http.Error(w, transport.ErrorsDtoToString(&errDTO), http.StatusInternalServerError)
+
+		return
+
+	}
+
+	Cryptos := transport.GetCryptosResponce{
+		Coins: cryptos,
+	}
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(Cryptos)
+}
+
+func (c *CryptoHandler) GetCryptoBySymbol(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	symbol := vars["symbol"]
+
+	crypto, err := c.cryptoService.ListCryptoBySymbol(symbol)
+	if err != nil {
+		errDTO := transport.ErrorsDTO{
+			Erorr: err.Error(),
+			Time:  time.Now(),
+		}
+
+		fmt.Println("Error!", errDTO)
+
+		http.Error(w, transport.ErrorsDtoToString(&errDTO), http.StatusNotFound)
+
+		return
+	}
+
+	cryptoResponce := transport.CryptoResponce{
+		Symbol:        crypto.Symbol,
+		Name:          crypto.Name,
+		Current_price: crypto.Current_price,
+		Last_updated:  crypto.Last_updated,
+	}
+
+	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(cryptoResponce)
 
 }

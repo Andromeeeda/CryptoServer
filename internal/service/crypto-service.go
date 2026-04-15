@@ -21,7 +21,7 @@ func NewCryptoService(cryptoRepository *repository.CryptoRep, coinGeckoApiKey st
 	return &CryptoService{
 		cryptoRepository: cryptoRepository,
 		coinGeckoClient:  &http.Client{Timeout: 10 * time.Second},
-		coinGeckoApiKey: coinGeckoApiKey,
+		coinGeckoApiKey:  coinGeckoApiKey,
 	}
 }
 
@@ -47,7 +47,7 @@ func (s *CryptoService) AddCrypto(symbol string) (*repository.Crypto, error) {
 	}
 
 	Crypto := repository.Crypto{
-		Symbol:        coinInfo.Symbol,
+		Symbol:        strings.ToUpper(coinInfo.Symbol),
 		Name:          coinInfo.Name,
 		Current_price: coinPrice,
 		Last_updated:  coinInfo.Last_updated,
@@ -98,7 +98,7 @@ func (s *CryptoService) getCoinId(symbol string) (string, error) {
 
 }
 
-//Получение информации о криптовалюте 
+// Получение информации о криптовалюте
 func (s *CryptoService) getCoinInfo(coinID string) (*CoinInfo, error) {
 
 	url := fmt.Sprintf("https://api.coingecko.com/api/v3/coins/%s", coinID)
@@ -127,7 +127,7 @@ func (s *CryptoService) getCoinInfo(coinID string) (*CoinInfo, error) {
 
 }
 
-//Получение цены криптовалюты 
+// Получение цены криптовалюты
 func (s *CryptoService) getCurrentPrice(coinID string) (float64, error) {
 
 	url := fmt.Sprintf("https://api.coingecko.com/api/v3/simple/price?ids=%s&vs_currencies=usd", coinID)
@@ -158,4 +158,14 @@ func (s *CryptoService) getCurrentPrice(coinID string) (float64, error) {
 
 	return price, nil
 
+}
+
+func (s *CryptoService) ListCrypto() ([]*repository.Crypto,error) {
+
+	return s.cryptoRepository.GetAllCryptos()
+}
+
+func (s *CryptoService) ListCryptoBySymbol(symbol string) (*repository.Crypto,error)  {
+
+	return s.cryptoRepository.GetCrypto(symbol)
 }
