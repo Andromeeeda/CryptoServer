@@ -32,6 +32,7 @@ func main() {
 	router.Path("/crypto/{symbol}/refresh").Methods("PUT").HandlerFunc(cryptoHandler.RefreshCryptoPrice)
 	router.Path("/crypto/{symbol}/history").Methods("GET").HandlerFunc(cryptoHandler.GetCryptoHistory)
 	router.Path("/crypto/{symbol}/stats").Methods("GET").HandlerFunc(cryptoHandler.GetCryptoStatistic)
+	router.Path("/crypto/{symbol}").Methods("DELETE").HandlerFunc(cryptoHandler.DeleteCrypto)
 
 	if err := http.ListenAndServe(":8080", router); err != nil {
 		fmt.Println("fail to listen server")

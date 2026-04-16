@@ -274,7 +274,7 @@ func (s *CryptoService) CryptoStatistic(symbol string) (*repository.Statistic, f
 	// Извлекаем только цены из массива [timestamp, price]
 	priceValues := make([]float64, len(prices))
 	for i, point := range prices {
-		priceValues[i] = point[1] 
+		priceValues[i] = point[1]
 	}
 
 	// Рассчет статистики
@@ -309,9 +309,23 @@ func (s *CryptoService) CryptoStatistic(symbol string) (*repository.Statistic, f
 		Records_count:        len(priceValues),
 	}
 
-	//добавление на хранение 
-	s.cryptoRepository.AddCryptoStatistic(symbol,stats)
+	//добавление на хранение
+	s.cryptoRepository.AddCryptoStatistic(symbol, stats)
 
 	return stats, currentPrice, nil
 
+}
+
+func (s *CryptoService) DeleteCryptoInfo(symbol string) error {
+
+	_, err := s.cryptoRepository.GetCrypto(symbol)
+	if err != nil {
+		return err
+	}
+
+	s.cryptoRepository.DeleteCrypto(symbol)
+
+	s.cryptoRepository.DeleteHistory(symbol)
+
+	return nil
 }

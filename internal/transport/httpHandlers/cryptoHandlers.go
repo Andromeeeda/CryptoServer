@@ -255,3 +255,26 @@ func (c *CryptoHandler) GetCryptoStatistic(w http.ResponseWriter, r *http.Reques
 	json.NewEncoder(w).Encode(cryptoStatisticResponce)
 	
 }
+
+func (s *CryptoHandler) DeleteCrypto(w http.ResponseWriter, r *http.Request) {
+
+	vars := mux.Vars(r)
+	symbol := vars["symbol"]
+
+	if err := s.cryptoService.DeleteCryptoInfo(symbol);err != nil {
+		errDTO := transport.ErrorsDTO{
+			Erorr: err.Error(),
+			Time:  time.Now(),
+		}
+		fmt.Println("Error!", errDTO)
+
+		http.Error(w, transport.ErrorsDtoToString(&errDTO), http.StatusNotFound)
+
+		return
+	}
+
+	responce := struct{}{}
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(responce)
+}

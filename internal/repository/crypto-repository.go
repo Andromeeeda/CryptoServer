@@ -7,7 +7,7 @@ import (
 type CryptoRep struct {
 	coins   map[string]*Crypto
 	history *CryptoHistoryPrice
-	stats map[string]*Statistic
+	stats   map[string]*Statistic
 }
 
 func NewCryptoRep() *CryptoRep {
@@ -66,12 +66,24 @@ func (r *CryptoRep) UpdatePrice(symbol string, NewCurrentPrice float64) (*Crypto
 
 }
 
-func (r *CryptoRep) AddCryptoHistoryPrice(symbol string, historyPrice []PriceEntry){
+func (r *CryptoRep) AddCryptoHistoryPrice(symbol string, historyPrice []PriceEntry) {
 
 	r.history.History[symbol] = historyPrice
 
 }
 
-func (r *CryptoRep) AddCryptoStatistic(symbol string,stats *Statistic) {
+func (r *CryptoRep) AddCryptoStatistic(symbol string, stats *Statistic) {
 	r.stats[symbol] = stats
+}
+
+func (r *CryptoRep) DeleteCrypto(symbol string) {
+	delete(r.coins, symbol)
+}
+
+func (r *CryptoRep) DeleteHistory(symbol string) {
+	delete(r.history.History, symbol)
+}
+
+func (r *CryptoRep) DeleteStats(symbol string) {
+	delete(r.stats,symbol)
 }
