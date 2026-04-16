@@ -7,6 +7,7 @@ import (
 type CryptoRep struct {
 	coins   map[string]*Crypto
 	history *CryptoHistoryPrice
+	stats map[string]*Statistic
 }
 
 func NewCryptoRep() *CryptoRep {
@@ -15,6 +16,7 @@ func NewCryptoRep() *CryptoRep {
 		history: &CryptoHistoryPrice{
 			History: make(map[string][]PriceEntry),
 		},
+		stats: make(map[string]*Statistic),
 	}
 }
 
@@ -68,4 +70,8 @@ func (r *CryptoRep) AddCryptoHistoryPrice(symbol string, historyPrice []PriceEnt
 
 	r.history.History[symbol] = historyPrice
 
+}
+
+func (r *CryptoRep) AddCryptoStatistic(symbol string,stats *Statistic) {
+	r.stats[symbol] = stats
 }

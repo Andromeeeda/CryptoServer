@@ -54,3 +54,9 @@ type CryptoHistoryResponce struct {
 	Symbol        string    `json:"symbol"`
 	History 	[]repository.PriceEntry `json:"history"`
 }
+
+type CryptoStatisticResponce struct {
+	Symbol        string    `json:"symbol"`
+	Current_price float64   `json:"current_price"`
+	Statistic repository.Statistic `json:"stats"`
+}

@@ -227,3 +227,31 @@ func (c *CryptoHandler) GetCryptoHistory(w http.ResponseWriter, r *http.Request)
 	json.NewEncoder(w).Encode(HistoryPriceResponce)
 
 }
+
+func (c *CryptoHandler) GetCryptoStatistic(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	symbol := vars["symbol"]
+
+	CryptoStatistic,current_price,err :=  c.cryptoService.CryptoStatistic(symbol)
+	if err != nil {
+		errDTO := transport.ErrorsDTO{
+			Erorr: err.Error(),
+			Time:  time.Now(),
+		}
+		fmt.Println("Error!", errDTO)
+
+		http.Error(w, transport.ErrorsDtoToString(&errDTO), http.StatusInternalServerError)
+
+		return
+	}
+
+	cryptoStatisticResponce := transport.CryptoStatisticResponce {
+		Symbol: symbol,
+		Current_price: current_price,
+		Statistic: *CryptoStatistic,
+	}
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(cryptoStatisticResponce)
+	
+}

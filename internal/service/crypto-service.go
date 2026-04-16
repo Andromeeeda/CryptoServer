@@ -254,3 +254,64 @@ func (s *CryptoService) getCryptoPriceHistory(coinID string) ([][]float64, error
 	return resultPrice.Prices, nil
 
 }
+
+func (s *CryptoService) CryptoStatistic(symbol string) (*repository.Statistic, float64, error) {
+
+	coinId, err := s.getCoinId(symbol)
+	if err != nil {
+		return nil, 0, core.ErrInternalServerError
+	}
+
+	prices, err := s.getCryptoPriceHistory(coinId)
+	if err != nil {
+		return nil, 0, err
+	}
+
+	if len(prices) == 0 {
+		return nil, 0, errors.New("no price data")
+	}
+
+	// Извлекаем только цены из массива [timestamp, price]
+	priceValues := make([]float64, len(prices))
+	for i, point := range prices {
+		priceValues[i] = point[1] 
+	}
+
+	// Рассчет статистики
+	minPrice := priceValues[0]
+	maxPrice := priceValues[0]
+	sum := 0.0
+
+	for _, price := range priceValues {
+		if price < minPrice {
+			minPrice = price
+		}
+		if price > maxPrice {
+			maxPrice = price
+		}
+		sum += price
+	}
+
+	avgPrice := sum / float64(len(priceValues))
+	firstPrice := priceValues[0]
+	lastPrice := priceValues[len(priceValues)-1]
+	priceChange := lastPrice - firstPrice
+	priceChangePercent := (priceChange / firstPrice) * 100
+
+	currentPrice := lastPrice
+
+	stats := &repository.Statistic{
+		Min_price:            minPrice,
+		Max_price:            maxPrice,
+		Avg_price:            avgPrice,
+		Price_change:         priceChange,
+		Price_change_percent: priceChangePercent,
+		Records_count:        len(priceValues),
+	}
+
+	//добавление на хранение 
+	s.cryptoRepository.AddCryptoStatistic(symbol,stats)
+
+	return stats, currentPrice, nil
+
+}
