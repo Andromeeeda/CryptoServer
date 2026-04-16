@@ -154,3 +154,76 @@ func (c *CryptoHandler) GetCryptoBySymbol(w http.ResponseWriter, r *http.Request
 	json.NewEncoder(w).Encode(cryptoResponce)
 
 }
+
+func (c *CryptoHandler) RefreshCryptoPrice(w http.ResponseWriter, r *http.Request) {
+
+	vars := mux.Vars(r)
+	symbol := vars["symbol"]
+
+	Crypto, err := c.cryptoService.RefreshPrice(symbol)
+	if err != nil {
+
+		if errors.Is(err, core.ErrNotFound) {
+			errDTO := transport.ErrorsDTO{
+				Erorr: err.Error(),
+				Time:  time.Now(),
+			}
+			fmt.Println("Error!", errDTO)
+
+			http.Error(w, transport.ErrorsDtoToString(&errDTO), http.StatusNotFound)
+
+			return
+		}
+
+		if errors.Is(err, core.ErrInternalServerError) {
+			errDTO := transport.ErrorsDTO{
+				Erorr: err.Error(),
+				Time:  time.Now(),
+			}
+			fmt.Println("Error!", errDTO)
+
+			http.Error(w, transport.ErrorsDtoToString(&errDTO), http.StatusInternalServerError)
+
+			return
+		}
+	}
+
+	responce := transport.CryptoResponce{
+		Symbol:        Crypto.Symbol,
+		Name:          Crypto.Name,
+		Current_price: Crypto.Current_price,
+		Last_updated:  Crypto.Last_updated,
+	}
+
+	w.WriteHeader(http.StatusOK)
+
+	json.NewEncoder(w).Encode(responce)
+
+}
+
+func (c *CryptoHandler) GetCryptoHistory(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	symbol := vars["symbol"]
+
+	priceHistory, err := c.cryptoService.CryptoHistory(symbol)
+	if err != nil {
+		errDTO := transport.ErrorsDTO{
+			Erorr: err.Error(),
+			Time:  time.Now(),
+		}
+		fmt.Println("Error!", errDTO)
+
+		http.Error(w, transport.ErrorsDtoToString(&errDTO), http.StatusInternalServerError)
+
+		return
+	}
+
+	HistoryPriceResponce := transport.CryptoHistoryResponce{
+		Symbol:  symbol,
+		History: priceHistory,
+	}
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(HistoryPriceResponce)
+
+}

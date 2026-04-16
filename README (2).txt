@@ -36,6 +36,7 @@
 
 - **GET /crypto/{symbol}/history** - получить историю цен криптовалюты
   - Response: `{"symbol": "BTC", "history": [{"price": 45000.50, "timestamp": "2024-01-01T12:00:00Z"}]}`
+  -Error (404/500): `{"error": "string"}`
 
 - **GET /crypto/{symbol}/stats** - получить статистику по ценам криптовалюты
   - Response: `{"symbol": "BTC", "current_price": 45000.50, "stats": {"min_price": 44000, "max_price": 46000, "avg_price": 45000, "price_change": 1000, "price_change_percent": 2.27, "records_count": 100}}`

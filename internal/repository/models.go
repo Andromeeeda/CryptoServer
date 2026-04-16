@@ -13,3 +13,12 @@ type Crypto struct {
 	Current_price float64
 	Last_updated  time.Time
 }
+
+type PriceEntry struct {
+	Price float64
+	Time  time.Time
+}
+
+type CryptoHistoryPrice struct {
+	History map[string][]PriceEntry
+}

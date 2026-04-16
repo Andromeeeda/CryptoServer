@@ -49,3 +49,8 @@ type CryptoResponce struct {
 type GetCryptosResponce struct {
 	Coins []*repository.Crypto `json:"cryptos"`
 }
+
+type CryptoHistoryResponce struct {
+	Symbol        string    `json:"symbol"`
+	History 	[]repository.PriceEntry `json:"history"`
+}

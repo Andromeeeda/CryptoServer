@@ -160,12 +160,97 @@ func (s *CryptoService) getCurrentPrice(coinID string) (float64, error) {
 
 }
 
-func (s *CryptoService) ListCrypto() ([]*repository.Crypto,error) {
+func (s *CryptoService) ListCrypto() ([]*repository.Crypto, error) {
 
 	return s.cryptoRepository.GetAllCryptos()
 }
 
-func (s *CryptoService) ListCryptoBySymbol(symbol string) (*repository.Crypto,error)  {
+func (s *CryptoService) ListCryptoBySymbol(symbol string) (*repository.Crypto, error) {
 
 	return s.cryptoRepository.GetCrypto(symbol)
+}
+
+func (s *CryptoService) RefreshPrice(symbol string) (*repository.Crypto, error) {
+
+	_, err := s.cryptoRepository.GetCrypto(symbol)
+	if err != nil {
+		return nil, core.ErrNotFound
+	}
+
+	coinId, err := s.getCoinId(symbol)
+	if err != nil {
+		return nil, core.ErrInternalServerError
+	}
+
+	NewCurrentPrice, err := s.getCurrentPrice(coinId)
+	if err != nil {
+		return nil, core.ErrInternalServerError
+	}
+
+	Crypto, err := s.cryptoRepository.UpdatePrice(symbol, NewCurrentPrice)
+	if err != nil {
+		return nil, core.ErrInternalServerError
+	}
+
+	return Crypto, nil
+
+}
+
+func (s *CryptoService) CryptoHistory(symbol string) ([]repository.PriceEntry, error) {
+
+	coinId, err := s.getCoinId(symbol)
+	if err != nil {
+		return nil, core.ErrInternalServerError
+	}
+
+	historyPrice, err := s.getCryptoPriceHistory(coinId)
+	if err != nil {
+		return nil, err
+	}
+
+	history := make([]repository.PriceEntry, 0, len(historyPrice))
+
+	for _, point := range historyPrice {
+
+		entry := repository.PriceEntry{
+			Price: point[1],
+			Time:  time.UnixMilli(int64(point[0])),
+		}
+
+		history = append(history, entry)
+	}
+
+	s.cryptoRepository.AddCryptoHistoryPrice(symbol, history)
+
+	return history, nil
+}
+
+func (s *CryptoService) getCryptoPriceHistory(coinID string) ([][]float64, error) {
+
+	url := fmt.Sprintf("https://api.coingecko.com/api/v3/coins/%s/market_chart?vs_currency=usd&days=30", coinID)
+
+	req, err := http.NewRequest("GET", url, nil)
+	if err != nil {
+		return nil, core.ErrInternalServerError
+	}
+
+	req.Header.Set("x-cg-demo-api-key", s.coinGeckoApiKey)
+
+	resp, err := s.coinGeckoClient.Do(req)
+	if err != nil {
+		return nil, core.ErrInternalServerError
+	}
+
+	defer resp.Body.Close()
+
+	var resultPrice struct {
+		Prices [][]float64 `json:"prices"`
+	}
+
+	if err := json.NewDecoder(resp.Body).Decode(&resultPrice); err != nil {
+		return nil, core.ErrInternalServerError
+	}
+
+	return resultPrice.Prices, nil
+
 }

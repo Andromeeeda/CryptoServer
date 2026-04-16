@@ -1,14 +1,20 @@
 package repository
 
-import "errors"
+import (
+	"errors"
+)
 
 type CryptoRep struct {
-	coins map[string]*Crypto
+	coins   map[string]*Crypto
+	history *CryptoHistoryPrice
 }
 
 func NewCryptoRep() *CryptoRep {
 	return &CryptoRep{
 		coins: make(map[string]*Crypto),
+		history: &CryptoHistoryPrice{
+			History: make(map[string][]PriceEntry),
+		},
 	}
 }
 
@@ -42,5 +48,24 @@ func (r *CryptoRep) GetCrypto(symbol string) (*Crypto, error) {
 		return nil, errors.New("Crypto not found")
 	}
 
-	return crypto,nil
+	return crypto, nil
+}
+
+func (r *CryptoRep) UpdatePrice(symbol string, NewCurrentPrice float64) (*Crypto, error) {
+
+	crypto, ok := r.coins[symbol]
+	if !ok {
+		return nil, errors.New("Crypto not found")
+	}
+
+	crypto.Current_price = NewCurrentPrice
+
+	return crypto, nil
+
+}
+
+func (r *CryptoRep) AddCryptoHistoryPrice(symbol string, historyPrice []PriceEntry){
+
+	r.history.History[symbol] = historyPrice
+
 }
