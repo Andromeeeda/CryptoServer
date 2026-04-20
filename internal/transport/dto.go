@@ -1,6 +1,7 @@
 package transport
 
 import (
+	"cryptoserver/internal/repository"
 	"encoding/json"
 	"time"
 )
@@ -39,9 +40,23 @@ type CryptoSymbolReguest struct {
 }
 
 type CryptoResponce struct {
-	Symbol        string `json:"symbol"`
-	Name          string `json:"name"`
-	Current_price float64 `json:"current_price"`
+	Symbol        string    `json:"symbol"`
+	Name          string    `json:"name"`
+	Current_price float64   `json:"current_price"`
 	Last_updated  time.Time `json:"last_updated"`
 }
 
+type GetCryptosResponce struct {
+	Coins []*repository.Crypto `json:"cryptos"`
+}
+
+type CryptoHistoryResponce struct {
+	Symbol        string    `json:"symbol"`
+	History 	[]repository.PriceEntry `json:"history"`
+}
+
+type CryptoStatisticResponce struct {
+	Symbol        string    `json:"symbol"`
+	Current_price float64   `json:"current_price"`
+	Statistic repository.Statistic `json:"stats"`
+}
