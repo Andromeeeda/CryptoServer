@@ -21,3 +21,4 @@ func GenerateJwtToken(username string) (string,error) {
 	return token.SignedString(secretKey)
 }
 
+
