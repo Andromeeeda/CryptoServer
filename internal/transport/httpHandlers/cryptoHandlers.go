@@ -2,11 +2,13 @@ package httphandlers
 
 import (
 	"cryptoserver/internal/core"
+	"cryptoserver/internal/middleware"
 	"cryptoserver/internal/service"
 	"cryptoserver/internal/transport"
 	"encoding/json"
 	"errors"
 	"fmt"
+	"log"
 	"net/http"
 	"time"
 
@@ -30,6 +32,23 @@ func (c *CryptoHandler) CreateCrypto(w http.ResponseWriter, r *http.Request) {
 	// не нужно будет внутри сервиса сделать http клиент и он у меня должен получить
 	// все информацию о конкретной криптовалюте далее я эти данные криптовалюты отправляю
 	// на хранение в repository. После чего отдаю ответ клиенту в виде JSon с криптовалютой
+
+	//Проверка аутентификации
+	username, err := middleware.VerifyAuth(r)
+	if err != nil {
+		errDTO := transport.ErrorsDTO{
+			Erorr: err.Error(),
+			Time:  time.Now(),
+		}
+
+		fmt.Println("authentication error")
+
+		http.Error(w, transport.ErrorsDtoToString(&errDTO), http.StatusUnauthorized)
+
+		return
+	}
+
+	log.Printf("User %s requested crypto list", username)
 
 	var cryptosymbolRequest transport.CryptoSymbolReguest
 	if err := json.NewDecoder(r.Body).Decode(&cryptosymbolRequest); err != nil {
@@ -102,6 +121,23 @@ func (c *CryptoHandler) CreateCrypto(w http.ResponseWriter, r *http.Request) {
 func (c *CryptoHandler) GetCrypto(w http.ResponseWriter, r *http.Request) {
 	//Хендлер вызывает функицю сервиса который обращается к репозиторию и получает слайс с криптой
 
+	//Проверка аутентификации
+	username, err := middleware.VerifyAuth(r)
+	if err != nil {
+		errDTO := transport.ErrorsDTO{
+			Erorr: err.Error(),
+			Time:  time.Now(),
+		}
+
+		fmt.Println("authentication error")
+
+		http.Error(w, transport.ErrorsDtoToString(&errDTO), http.StatusUnauthorized)
+
+		return
+	}
+
+	log.Printf("User %s requested crypto list", username)
+
 	cryptos, err := c.cryptoService.ListCrypto()
 	if err != nil {
 		errDTO := transport.ErrorsDTO{
@@ -126,6 +162,23 @@ func (c *CryptoHandler) GetCrypto(w http.ResponseWriter, r *http.Request) {
 }
 
 func (c *CryptoHandler) GetCryptoBySymbol(w http.ResponseWriter, r *http.Request) {
+	//Проверка аутентификации
+	username, err := middleware.VerifyAuth(r)
+	if err != nil {
+		errDTO := transport.ErrorsDTO{
+			Erorr: err.Error(),
+			Time:  time.Now(),
+		}
+
+		fmt.Println("authentication error")
+
+		http.Error(w, transport.ErrorsDtoToString(&errDTO), http.StatusUnauthorized)
+
+		return
+	}
+
+	log.Printf("User %s requested crypto list", username)
+
 	vars := mux.Vars(r)
 	symbol := vars["symbol"]
 
@@ -156,6 +209,22 @@ func (c *CryptoHandler) GetCryptoBySymbol(w http.ResponseWriter, r *http.Request
 }
 
 func (c *CryptoHandler) RefreshCryptoPrice(w http.ResponseWriter, r *http.Request) {
+	//Проверка аутентификации
+	username, err := middleware.VerifyAuth(r)
+	if err != nil {
+		errDTO := transport.ErrorsDTO{
+			Erorr: err.Error(),
+			Time:  time.Now(),
+		}
+
+		fmt.Println("authentication error")
+
+		http.Error(w, transport.ErrorsDtoToString(&errDTO), http.StatusUnauthorized)
+
+		return
+	}
+
+	log.Printf("User %s requested crypto list", username)
 
 	vars := mux.Vars(r)
 	symbol := vars["symbol"]
@@ -202,6 +271,23 @@ func (c *CryptoHandler) RefreshCryptoPrice(w http.ResponseWriter, r *http.Reques
 }
 
 func (c *CryptoHandler) GetCryptoHistory(w http.ResponseWriter, r *http.Request) {
+	//Проверка аутентификации
+	username, err := middleware.VerifyAuth(r)
+	if err != nil {
+		errDTO := transport.ErrorsDTO{
+			Erorr: err.Error(),
+			Time:  time.Now(),
+		}
+
+		fmt.Println("authentication error")
+
+		http.Error(w, transport.ErrorsDtoToString(&errDTO), http.StatusUnauthorized)
+
+		return
+	}
+
+	log.Printf("User %s requested crypto list", username)
+
 	vars := mux.Vars(r)
 	symbol := vars["symbol"]
 
@@ -229,10 +315,27 @@ func (c *CryptoHandler) GetCryptoHistory(w http.ResponseWriter, r *http.Request)
 }
 
 func (c *CryptoHandler) GetCryptoStatistic(w http.ResponseWriter, r *http.Request) {
+	//Проверка аутентификации
+	username, err := middleware.VerifyAuth(r)
+	if err != nil {
+		errDTO := transport.ErrorsDTO{
+			Erorr: err.Error(),
+			Time:  time.Now(),
+		}
+
+		fmt.Println("authentication error")
+
+		http.Error(w, transport.ErrorsDtoToString(&errDTO), http.StatusUnauthorized)
+
+		return
+	}
+
+	log.Printf("User %s requested crypto list", username)
+
 	vars := mux.Vars(r)
 	symbol := vars["symbol"]
 
-	CryptoStatistic,current_price,err :=  c.cryptoService.CryptoStatistic(symbol)
+	CryptoStatistic, current_price, err := c.cryptoService.CryptoStatistic(symbol)
 	if err != nil {
 		errDTO := transport.ErrorsDTO{
 			Erorr: err.Error(),
@@ -245,23 +348,40 @@ func (c *CryptoHandler) GetCryptoStatistic(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
-	cryptoStatisticResponce := transport.CryptoStatisticResponce {
-		Symbol: symbol,
+	cryptoStatisticResponce := transport.CryptoStatisticResponce{
+		Symbol:        symbol,
 		Current_price: current_price,
-		Statistic: *CryptoStatistic,
+		Statistic:     *CryptoStatistic,
 	}
 
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(cryptoStatisticResponce)
-	
+
 }
 
 func (s *CryptoHandler) DeleteCrypto(w http.ResponseWriter, r *http.Request) {
+	//Проверка аутентификации
+	username, err := middleware.VerifyAuth(r)
+	if err != nil {
+		errDTO := transport.ErrorsDTO{
+			Erorr: err.Error(),
+			Time:  time.Now(),
+		}
+
+		fmt.Println("authentication error")
+
+		http.Error(w, transport.ErrorsDtoToString(&errDTO), http.StatusUnauthorized)
+
+		return
+	}
+
+	log.Printf("User %s requested crypto list", username)
+	
 
 	vars := mux.Vars(r)
 	symbol := vars["symbol"]
 
-	if err := s.cryptoService.DeleteCryptoInfo(symbol);err != nil {
+	if err := s.cryptoService.DeleteCryptoInfo(symbol); err != nil {
 		errDTO := transport.ErrorsDTO{
 			Erorr: err.Error(),
 			Time:  time.Now(),

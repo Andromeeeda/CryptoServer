@@ -4,7 +4,7 @@ import "time"
 
 type User struct {
 	Username string
-	Password string
+	HashPassword string
 }
 
 type Crypto struct {
