@@ -23,6 +23,7 @@ func GenerateJwtToken(username string) (string, error) {
 	return token.SignedString(secretKey)
 }
 
+
 func VerifyJwtToken(tokenString string) (string, error) {
 
 	token, err := jwt.ParseWithClaims(tokenString, &jwt.RegisteredClaims{},
