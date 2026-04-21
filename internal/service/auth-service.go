@@ -3,6 +3,7 @@ package service
 import (
 	"cryptoserver/internal/repository"
 	"cryptoserver/pkg/jwt"
+	"cryptoserver/pkg/password"
 	"errors"
 )
 
@@ -16,7 +17,7 @@ func NewAuthService(userRepository *repository.UserRep) *AuthService {
 	}
 }
 
-func (s *AuthService) RegisterUser(name string, password string) (string, error) {
+func (s *AuthService) RegisterUser(name string, userPassword string) (string, error) {
 
 	//1.Проверить есть ли пользователь. Если есть то отменить регистрацию
 	//2.Создать и Добавить нового пользователя в мапу
@@ -27,9 +28,14 @@ func (s *AuthService) RegisterUser(name string, password string) (string, error)
 		return "", errors.New("user already exist")
 	}
 
+	hashPassword, err := password.Hash(userPassword)
+	if err != nil {
+		return "", err
+	}
+
 	user := repository.User{
-		Username: name,
-		Password: password,
+		Username:     name,
+		HashPassword: hashPassword,
 	}
 
 	//добавление и создание в мапу
@@ -48,18 +54,18 @@ func (s *AuthService) RegisterUser(name string, password string) (string, error)
 
 }
 
-func (s *AuthService) LoginUser(name string, password string) (string, error) {
+func (s *AuthService) LoginUser(name string, userPassword string) (string, error) {
 
 	//1. Проверить введены ли поля
 	//2. Получить данные пользователя
-	//3. Проверить пароль что он подходит
+	//3. Проверить пароль что пароль пользователя совпадает с хеш-паролем 
 	//4. Если все корректно сгенерировать JWT токен и вернуть ответ
 
 	if name == "" {
 		return "", errors.New("username is required")
 	}
 
-	if password == "" {
+	if userPassword == "" {
 		return "", errors.New("password is required")
 	}
 
@@ -70,8 +76,8 @@ func (s *AuthService) LoginUser(name string, password string) (string, error) {
 	}
 
 	//Проверка пароля
-	if user.Password != password {
-		return "", errors.New("Incorrect password")
+	if err := password.CheckhashPassword(user.HashPassword, userPassword); err != nil {
+		return "", err
 	}
 
 	jwtToken, err := jwt.GenerateJwtToken(user.Username)
