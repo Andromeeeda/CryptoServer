@@ -60,3 +60,21 @@ type CryptoStatisticResponce struct {
 	Current_price float64   `json:"current_price"`
 	Statistic repository.Statistic `json:"stats"`
 }
+
+type SheduleResponce struct {
+	Enabled bool  `json:"enabled"`
+	Interval_seconds int  `json:"interval_seconds"`
+	Last_update time.Time	`json:"last_update"`
+	Next_update time.Time	`json:"next_update"`
+}
+
+type ChangeSheduleRequest struct {
+	Enabled bool  `json:"enabled"`
+	Interval_seconds int  `json:"interval_seconds"`
+}
+
+type ChangeSheduleResponce struct {
+	Enabled bool  `json:"enabled"`
+	Interval_seconds int  `json:"interval_seconds"`
+}
+

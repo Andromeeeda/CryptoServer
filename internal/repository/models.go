@@ -31,3 +31,10 @@ type Statistic struct {
 	Price_change_percent float64
 	Records_count        int
 }
+
+type Shedule struct {
+	Enabled bool
+	Interval_seconds int 
+	Last_update time.Time
+	Next_update time.Time
+}
