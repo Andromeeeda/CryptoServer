@@ -196,6 +196,29 @@ func (s *CryptoService) RefreshPrice(symbol string) (*repository.Crypto, error) 
 
 }
 
+func (s *CryptoService) RefreshAllPrices() (int,error) {
+
+	cryptos,err := s.cryptoRepository.GetAllCryptos()
+	if err != nil {
+		return 0,err
+	}
+
+	if len(cryptos) == 0 {
+		return 0,errors.New("No cryptocurrency added")
+	}
+
+	updatedcount := 0
+	for _,crypto := range cryptos {
+		if _,err := s.RefreshPrice(crypto.Symbol); err != nil {
+			continue
+		}
+		updatedcount++
+	}
+
+	return updatedcount,nil 
+
+}
+
 func (s *CryptoService) CryptoHistory(symbol string) ([]repository.PriceEntry, error) {
 
 	coinId, err := s.getCoinId(symbol)

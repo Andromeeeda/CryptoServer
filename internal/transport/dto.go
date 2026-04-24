@@ -78,3 +78,9 @@ type ChangeSheduleResponce struct {
 	Interval_seconds int  `json:"interval_seconds"`
 }
 
+type TriggerSheduleResponce struct {
+	Update_count int `json:"update_count"`
+	Timestamp time.Time `json:"timestamp"`
+}
+
+
