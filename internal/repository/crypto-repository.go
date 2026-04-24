@@ -2,6 +2,7 @@ package repository
 
 import (
 	"errors"
+	"time"
 )
 
 type CryptoRep struct {
@@ -61,6 +62,7 @@ func (r *CryptoRep) UpdatePrice(symbol string, NewCurrentPrice float64) (*Crypto
 	}
 
 	crypto.Current_price = NewCurrentPrice
+	crypto.Last_updated = time.Now()
 
 	return crypto, nil
 
@@ -85,5 +87,5 @@ func (r *CryptoRep) DeleteHistory(symbol string) {
 }
 
 func (r *CryptoRep) DeleteStats(symbol string) {
-	delete(r.stats,symbol)
+	delete(r.stats, symbol)
 }

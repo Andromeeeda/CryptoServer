@@ -41,7 +41,7 @@ func (c *CryptoHandler) CreateCrypto(w http.ResponseWriter, r *http.Request) {
 			Time:  time.Now(),
 		}
 
-		fmt.Println("authentication error")
+		fmt.Println("authentification error",errDTO)
 
 		http.Error(w, transport.ErrorsDtoToString(&errDTO), http.StatusUnauthorized)
 
@@ -129,7 +129,7 @@ func (c *CryptoHandler) GetCrypto(w http.ResponseWriter, r *http.Request) {
 			Time:  time.Now(),
 		}
 
-		fmt.Println("authentication error")
+		fmt.Println("authentification error",errDTO)
 
 		http.Error(w, transport.ErrorsDtoToString(&errDTO), http.StatusUnauthorized)
 
@@ -170,7 +170,7 @@ func (c *CryptoHandler) GetCryptoBySymbol(w http.ResponseWriter, r *http.Request
 			Time:  time.Now(),
 		}
 
-		fmt.Println("authentication error")
+		fmt.Println("authentification error",errDTO)
 
 		http.Error(w, transport.ErrorsDtoToString(&errDTO), http.StatusUnauthorized)
 
@@ -217,7 +217,7 @@ func (c *CryptoHandler) RefreshCryptoPrice(w http.ResponseWriter, r *http.Reques
 			Time:  time.Now(),
 		}
 
-		fmt.Println("authentication error")
+		fmt.Println("authentification error",errDTO)
 
 		http.Error(w, transport.ErrorsDtoToString(&errDTO), http.StatusUnauthorized)
 
@@ -279,7 +279,7 @@ func (c *CryptoHandler) GetCryptoHistory(w http.ResponseWriter, r *http.Request)
 			Time:  time.Now(),
 		}
 
-		fmt.Println("authentication error")
+		fmt.Println("authentification error",errDTO)
 
 		http.Error(w, transport.ErrorsDtoToString(&errDTO), http.StatusUnauthorized)
 
@@ -323,7 +323,7 @@ func (c *CryptoHandler) GetCryptoStatistic(w http.ResponseWriter, r *http.Reques
 			Time:  time.Now(),
 		}
 
-		fmt.Println("authentication error")
+		fmt.Println("authentification error",errDTO)
 
 		http.Error(w, transport.ErrorsDtoToString(&errDTO), http.StatusUnauthorized)
 
@@ -368,7 +368,7 @@ func (s *CryptoHandler) DeleteCrypto(w http.ResponseWriter, r *http.Request) {
 			Time:  time.Now(),
 		}
 
-		fmt.Println("authentication error")
+		fmt.Println("authentification error",errDTO)
 
 		http.Error(w, transport.ErrorsDtoToString(&errDTO), http.StatusUnauthorized)
 

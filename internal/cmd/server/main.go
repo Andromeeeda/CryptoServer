@@ -34,6 +34,16 @@ func main() {
 	router.Path("/crypto/{symbol}/stats").Methods("GET").HandlerFunc(cryptoHandler.GetCryptoStatistic)
 	router.Path("/crypto/{symbol}").Methods("DELETE").HandlerFunc(cryptoHandler.DeleteCrypto)
 
+	sheduleRepository := repository.NewSheduleRepository(&repository.SheduleConfig)
+	sheduleService := service.NewSheduleService(sheduleRepository,cryptoService)
+	sheduleHandler := httphandlers.NewSheduleHandlers(sheduleService)
+
+	router.Path("/shedule").Methods("GET").HandlerFunc(sheduleHandler.GetShedule)
+	router.Path("/shedule").Methods("PUT").HandlerFunc(sheduleHandler.PutShedule)
+	router.Path("/shedule/trigger").Methods("POST").HandlerFunc(sheduleHandler.SheduleTrigger)
+
+	sheduleService.SheduleStart()
+
 	if err := http.ListenAndServe(":8080", router); err != nil {
 		fmt.Println("fail to listen server")
 	}
